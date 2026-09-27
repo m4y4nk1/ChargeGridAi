@@ -1,0 +1,73 @@
+# Charger sizing (Section 9.8 of the project brief). Numeric parameters use the
+# value/illustrative convention (config/demand/segments.yaml): the illustrative
+# fallback is used, and reported, until a sourced value replaces it. Calibrate
+# against real utilisation data (operator/OCPI feeds, Phase 10).
+schema_version: 2
+
+service_targets:
+  max_wait_minutes: 10
+  max_prob_wait: 0.10               # brief: P(wait > 10 min) <= 10% in the peak hour
+  # Peak-hour charger occupancy above this is rejected even if the wait target holds.
+  max_peak_utilisation: { value: REPLACE_ME, illustrative: 0.85, source: REPLACE_ME, as_of: REPLACE_ME }
+  # Daily mean utilisation band; below `min` the site is flagged as oversized.
+  utilisation_band:
+    min: { value: REPLACE_ME, illustrative: 0.10, source: REPLACE_ME, as_of: REPLACE_ME }
+    max: { value: REPLACE_ME, illustrative: 0.45, source: REPLACE_ME, as_of: REPLACE_ME }
+
+simulation:
+  simulated_days: 1000              # brief: validate the chosen mix over 1,000 days
+  engine: simpy
+  seed: 20260926
+  # Session duration variability (gamma, coefficient of variation). Erlang-C assumes
+  # exponential service (CV = 1), so it is the more conservative of the two.
+  service_time_cv: { value: REPLACE_ME, illustrative: 0.5, source: REPLACE_ME, as_of: REPLACE_ME }
+
+# Minutes per session spent parking, plugging in and leaving, added to charge time.
+plug_in_overhead_minutes: { value: REPLACE_ME, illustrative: 5, source: REPLACE_ME, as_of: REPLACE_ME }
+
+# Share of a charger's rated power delivered on average over a session (charging-curve taper).
+charging_curve_taper_factor:
+  AC_7:   { value: REPLACE_ME, illustrative: 1.0,  source: REPLACE_ME, as_of: REPLACE_ME }
+  AC_22:  { value: REPLACE_ME, illustrative: 1.0,  source: REPLACE_ME, as_of: REPLACE_ME }
+  DC_30:  { value: REPLACE_ME, illustrative: 0.9,  source: REPLACE_ME, as_of: REPLACE_ME }
+  DC_60:  { value: REPLACE_ME, illustrative: 0.85, source: REPLACE_ME, as_of: REPLACE_ME }
+  DC_120: { value: REPLACE_ME, illustrative: 0.75, source: REPLACE_ME, as_of: REPLACE_ME }
+  DC_180: { value: REPLACE_ME, illustrative: 0.7,  source: REPLACE_ME, as_of: REPLACE_ME }
+  DC_240: { value: REPLACE_ME, illustrative: 0.65, source: REPLACE_ME, as_of: REPLACE_ME }
+  DC_350: { value: REPLACE_ME, illustrative: 0.6,  source: REPLACE_ME, as_of: REPLACE_ME }
+
+# Which segments use which charger type, and each segment's max charging power
+# (kW) — a 120 kW charger still charges a 50 kW car at 50 kW.
+segments:
+  e2w:            { uses: [AC], max_kw: { value: REPLACE_ME, illustrative: 3,   source: REPLACE_ME, as_of: REPLACE_ME }, connectors: { LECCS: 0.7, TYPE2_AC: 0.3 } }
+  e3w_passenger:  { uses: [AC], max_kw: { value: REPLACE_ME, illustrative: 7,   source: REPLACE_ME, as_of: REPLACE_ME }, connectors: { LECCS: 0.6, TYPE2_AC: 0.4 } }
+  e3w_goods:      { uses: [AC], max_kw: { value: REPLACE_ME, illustrative: 7,   source: REPLACE_ME, as_of: REPLACE_ME }, connectors: { LECCS: 0.6, TYPE2_AC: 0.4 } }
+  e4w_private:    { uses: [AC, DC], max_kw: { value: REPLACE_ME, illustrative: 50,  source: REPLACE_ME, as_of: REPLACE_ME }, connectors: { CCS2: 0.95, CHADEMO: 0.05 } }
+  e4w_fleet_taxi: { uses: [AC, DC], max_kw: { value: REPLACE_ME, illustrative: 50,  source: REPLACE_ME, as_of: REPLACE_ME }, connectors: { CCS2: 0.8, BHARAT_DC001: 0.2 } }
+  elcv_etruck:    { uses: [AC, DC], max_kw: { value: REPLACE_ME, illustrative: 60,  source: REPLACE_ME, as_of: REPLACE_ME }, connectors: { CCS2: 1.0 } }
+  ebus:           { uses: [DC], max_kw: { value: REPLACE_ME, illustrative: 150, source: REPLACE_ME, as_of: REPLACE_ME }, connectors: { CCS2: 1.0 } }
+
+# Connector guns per charger by type (the connector mix is spread over these).
+guns_per_charger: { AC: 1, DC: 2 }
+
+# 24-hour arrival curves (relative weights, hour 0 = midnight), per segment group.
+# Illustrative shapes, not measured: private cars peak in the evening, fleets
+# around shift changes, buses and LCVs in the midday lull.
+arrival_curves:
+  private: [1, 1, 1, 1, 1, 2, 3, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 8, 9, 9, 8, 6, 3, 2]
+  fleet:   [3, 2, 2, 2, 3, 5, 7, 8, 7, 5, 5, 6, 7, 7, 6, 6, 7, 8, 8, 7, 6, 5, 4, 3]
+  commercial: [1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 8, 9, 9, 9, 8, 7, 6, 5, 4, 3, 2, 2, 1, 1]
+segment_curve:
+  e2w: private
+  e3w_passenger: fleet
+  e3w_goods: commercial
+  e4w_private: private
+  e4w_fleet_taxi: fleet
+  elcv_etruck: commercial
+  ebus: commercial
+
+# Host-type multipliers on the hourly curve (applied, then renormalised).
+host_type_arrival_modifier:
+  MALL:               [0.5, 0.3, 0.2, 0.2, 0.2, 0.3, 0.5, 0.7, 0.8, 0.9, 1.1, 1.3, 1.4, 1.4, 1.3, 1.3, 1.4, 1.5, 1.6, 1.6, 1.5, 1.2, 0.8, 0.6]
+  OFFICE_PARK:        [0.3, 0.2, 0.2, 0.2, 0.3, 0.5, 0.9, 1.4, 1.7, 1.6, 1.4, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.2, 1.0, 0.8, 0.6, 0.5, 0.4, 0.3]
+  HIGHWAY_RESTAURANT: [0.8, 0.7, 0.7, 0.7, 0.8, 0.9, 1.0, 1.1, 1.1, 1.1, 1.1, 1.2, 1.3, 1.2, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.0, 1.0, 0.9, 0.8]

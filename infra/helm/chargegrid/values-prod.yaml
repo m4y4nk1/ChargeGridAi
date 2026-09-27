@@ -1,0 +1,17 @@
+env: prod
+host: app.chargegrid.example
+config:
+  APP_ENV: prod
+  AUTH_REQUIRED: "true"
+  CORS_ORIGINS: '["https://app.chargegrid.example"]'
+externalSecret:
+  remoteKey: chargegrid/prod
+api:
+  replicas: 3
+  hpa: { enabled: true, min: 3, max: 12, cpu: 65 }
+worker:
+  replicas: 2
+temporalWorker:
+  replicas: 2
+frontend:
+  replicas: 3

@@ -1,0 +1,44 @@
+# Unit costs (₹) for CAPEX/OPEX line items (Section 9.10 of the project brief).
+# Every value below is illustrative only until sourced — the UI must show a
+# placeholder-in-use warning banner while any REPLACE_ME remains (Section 16).
+# `illustrative` values (Phase 6) are round-number stand-ins so the optimiser
+# can run; they are NOT quotes. Replace `value` with sourced prices. AC 7 kW
+# has no line yet; land lease is excluded from site cost until finance
+# (Phase 7) knows each site's footprint.
+schema_version: 2
+
+capex:
+  land_lease_deposit_inr_per_sqm: { value: REPLACE_ME, illustrative: 2000, source: REPLACE_ME, as_of: REPLACE_ME }
+  civil_works_inr_per_site: { value: REPLACE_ME, illustrative: 500000, source: REPLACE_ME, as_of: REPLACE_ME }
+  canopy_inr_per_site: { value: REPLACE_ME, illustrative: 300000, source: REPLACE_ME, as_of: REPLACE_ME }
+  charger_ac_7kw_inr: { value: REPLACE_ME, illustrative: 60000, source: REPLACE_ME, as_of: REPLACE_ME }
+  charger_ac_22kw_inr: { value: REPLACE_ME, illustrative: 150000, source: REPLACE_ME, as_of: REPLACE_ME }
+  charger_dc_60kw_inr: { value: REPLACE_ME, illustrative: 1200000, source: REPLACE_ME, as_of: REPLACE_ME }
+  charger_dc_120kw_inr: { value: REPLACE_ME, illustrative: 2200000, source: REPLACE_ME, as_of: REPLACE_ME }
+  charger_dc_180kw_inr: { value: REPLACE_ME, illustrative: 3200000, source: REPLACE_ME, as_of: REPLACE_ME }
+  charger_dc_240kw_inr: { value: REPLACE_ME, illustrative: 4200000, source: REPLACE_ME, as_of: REPLACE_ME }
+  charger_dc_350kw_inr: { value: REPLACE_ME, illustrative: 6500000, source: REPLACE_ME, as_of: REPLACE_ME }
+  installation_pct_of_equipment: { value: REPLACE_ME, illustrative: 0.1, source: REPLACE_ME, as_of: REPLACE_ME }
+  transformer_inr: { value: REPLACE_ME, illustrative: 1500000, source: REPLACE_ME, as_of: REPLACE_ME }
+  ht_connection_inr: { value: REPLACE_ME, illustrative: 1000000, source: REPLACE_ME, as_of: REPLACE_ME }
+  lt_connection_inr: { value: REPLACE_ME, illustrative: 200000, source: REPLACE_ME, as_of: REPLACE_ME }
+  # Sanctioned load above this needs an HT (11 kV) connection and a transformer.
+  lt_max_sanctioned_kw: { value: REPLACE_ME, illustrative: 150, source: "MERC supply code (verify)", as_of: REPLACE_ME }
+  # sanctioned_load_kW = sum(charger_kW) x diversity_factor (Section 9.8 step 5).
+  diversity_factor: { value: REPLACE_ME, illustrative: 0.8, source: REPLACE_ME, as_of: REPLACE_ME }
+  pv_inr_per_kwp: { value: REPLACE_ME, illustrative: 45000, source: REPLACE_ME, as_of: REPLACE_ME }
+  bess_inr_per_kwh: { value: REPLACE_ME, illustrative: 25000, source: REPLACE_ME, as_of: REPLACE_ME }
+  software_networking_inr_per_site: { value: REPLACE_ME, illustrative: 100000, source: REPLACE_ME, as_of: REPLACE_ME }
+  contingency_pct: { value: REPLACE_ME, illustrative: 0.1, source: REPLACE_ME, as_of: REPLACE_ME }
+
+opex:
+  maintenance_pct_of_capex_per_year: { value: REPLACE_ME, illustrative: 0.03, source: REPLACE_ME, as_of: REPLACE_ME }
+  rent_revenue_share_pct: { value: REPLACE_ME, illustrative: 0.1, source: REPLACE_ME, as_of: REPLACE_ME }
+  network_roaming_fee_pct: { value: REPLACE_ME, illustrative: 0.02, source: REPLACE_ME, as_of: REPLACE_ME }
+  payment_processing_pct: { value: REPLACE_ME, illustrative: 0.02, source: REPLACE_ME, as_of: REPLACE_ME }
+  staff_inr_per_site_per_year: { value: REPLACE_ME, illustrative: 300000, source: REPLACE_ME, as_of: REPLACE_ME }
+  insurance_pct_of_capex_per_year: { value: REPLACE_ME, illustrative: 0.005, source: REPLACE_ME, as_of: REPLACE_ME }
+
+subsidy:
+  pm_edrive_eligible_default: false
+  note: "Subsidy eligibility is a configurable input per scenario, never assumed (Section 9.10)."

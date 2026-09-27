@@ -1,0 +1,53 @@
+# Optimisation (Section 9.7). Model A: budget-constrained capacitated maximal
+# covering (MCLP) on OR-Tools; methodology in docs/methodology/optimisation.md.
+schema_version: 1
+
+solver: HIGHS                   # OR-Tools backend (HIGHS | SCIP | CBC)
+# Every solve races a greedy plan (evaluated exactly) against the MIP and keeps the
+# better one; the MIP's bound makes the reported gap honest either way.
+time_limit_s: 60                # base plan, in the background run
+whatif_time_limit_s: 6.5        # what-if target is < 10 s end to end (Section 9.7)
+phasing_time_limit_s: 12        # per period of a Model C phased plan (3 periods in under ~45 s)
+mip_gap: 0.01
+
+# Candidates the model may open: the best-scored feasible sites plus every
+# user site. Bounds problem size for the < 10 s what-if path.
+candidate_pool: 200
+
+# Charger bundles per site (z_jk): `count` chargers of one of the scenario's classes.
+bundle_counts: [2, 4]
+
+# Default N_max when a scenario sets a budget but no site limit.
+default_max_sites: 50
+
+# Selected sites closer than this can't both open (x_j + x_j' <= 1).
+min_spacing_m: { value: REPLACE_ME, illustrative: 1500, source: REPLACE_ME, as_of: REPLACE_ME }
+
+# Objective: sum(v_j * y_ij) - lambda * cost. v_j = 0.5 + score_j / 200, so a
+# top-scored site's kWh counts double a bottom-scored one's; lambda turns rupees
+# into kWh/day-equivalents (1e-6: Rs 10 lakh ~ 1 kWh/day) as a tie-breaker that
+# stops the model buying capacity it can't fill.
+value:
+  score_floor: 0.5
+  lambda_per_inr: 1.0e-6
+
+why_not:
+  pool_multiple: 3              # re-solve for unselected sites ranked within top 3 x N
+  max_sites: 15
+  time_limit_s: 2
+
+# Module C strategies: each is a point on the cost/coverage/equity trade-off.
+strategies:
+  # value_by: kwh (every kWh/day equal) | score (kWh weighted by site score under
+  # `profile`). population_weight > 0 adds MCLP population coverage of
+  # underserved cells, scaled so covering all of them equals the region's gap kWh.
+  max_coverage: { label: "Maximum coverage",  value_by: kwh,   kwh_weight: 1.0,  population_weight: 0.0, lambda_multiplier: 0 }
+  equity:       { label: "Equity focus",      value_by: kwh,   kwh_weight: 0.25, population_weight: 1.0, lambda_multiplier: 1 }
+  # Cost optimised: the cheapest plan that still serves 90% of what maximum coverage
+  # serves at the same budget (cost is minimised; kWh only breaks ties).
+  cost:         { label: "Cost optimised",    value_by: kwh,   kwh_weight: 0.001, population_weight: 0.0, lambda_multiplier: 1, coverage_of: max_coverage, coverage_share: 0.9 }
+  commercial:   { label: "Commercial return", value_by: score, kwh_weight: 1.0,  population_weight: 0.0, lambda_multiplier: 1, profile: cpo_commercial }
+
+# Pareto front: every strategy at each budget share of the scenario budget.
+pareto_budget_shares: [0.5, 1.0, 1.5, 2.0]
+pareto_time_limit_s: 2          # share 1.0 (the module C strategies) gets whatif_time_limit_s

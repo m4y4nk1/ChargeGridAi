@@ -1,0 +1,13 @@
+# Weight profile: OEM network coverage (Section 9.6 of the project brief)
+name: oem_coverage
+label: "OEM network coverage"
+version: 1
+weights:
+  demand: 0.20
+  accessibility: 0.20
+  traffic: 0.15
+  grid: 0.10
+  land: 0.05
+  future_growth: 0.15
+  competition_gap: 0.15
+  equity: 0.00

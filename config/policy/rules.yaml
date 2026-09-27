@@ -1,0 +1,47 @@
+# Feasibility hard constraints (Section 9.5). Numeric thresholds use the
+# value / illustrative convention (see config/demand/segments.yaml): an
+# illustrative fallback is used, and reported, until a sourced value exists.
+# Populate from Ministry of Power guidelines and the Maharashtra EV policy
+# (docs/verification.md item 9).
+schema_version: 2
+
+feasibility_rules:
+  F01:
+    description: Inside water, forest, protected area, military land or an aerodrome
+    enabled: true
+  F02:
+    description: No drivable road within the access distance
+    enabled: true
+    max_road_distance_m: { value: 50, source: "Section 9.5 of the brief", as_of: 2026-09-25 }
+  F03:
+    description: Near an existing DC station in an area whose demand is already met
+    enabled: true
+    applies_to: dc
+    min_spacing_m: { value: REPLACE_ME, illustrative: 1000, source: REPLACE_ME, as_of: REPLACE_ME }
+    # A candidate's cell counts as already served when existing supply covers
+    # at least this share of its demand (2SFCA access ratio, Phase 3).
+    served_access_ratio: { value: REPLACE_ME, illustrative: 1.0, source: REPLACE_ME, as_of: REPLACE_ME }
+  F04:
+    description: Too far from a suitable grid asset
+    enabled: true
+    # Grid data below this confidence can't reject a site; it becomes a score
+    # penalty in Phase 5 instead (Section 2 principle 5).
+    min_grid_confidence: MEDIUM
+    max_substation_distance_m: { value: REPLACE_ME, illustrative: 5000, source: REPLACE_ME, as_of: REPLACE_ME }
+  F05:
+    description: Incompatible host or land use for the charger class
+    enabled: true
+    applies_to: dc
+    # Tertiary counts as arterial access: in Pune's OSM many through-roads that
+    # carry buses and trucks (e.g. inner ring segments) are tagged tertiary.
+    arterial_road_classes: [motorway, trunk, primary, secondary, tertiary, motorway_link, trunk_link, primary_link, secondary_link, tertiary_link]
+    # A DC site on a residential interior street with no arterial nearby.
+    max_arterial_distance_m: { value: REPLACE_ME, illustrative: 300, source: REPLACE_ME, as_of: REPLACE_ME }
+  F06:
+    description: Hazard overlay (flood zones)
+    enabled: false   # no flood-zone layer ingested yet
+  F07:
+    description: Duplicate of a selected site within spacing
+    enabled: true    # evaluated during optimisation (Phase 6), once sites are selected
+
+spacing_guidance_source: REPLACE_ME   # cite the Ministry of Power / NITI Aayog document + page

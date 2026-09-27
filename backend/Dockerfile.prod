@@ -1,0 +1,20 @@
+# Production image: no dev dependencies, no --reload, non-root, byte-code off so the
+# root filesystem can be read-only (Helm sets readOnlyRootFilesystem).
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 MODEL_CACHE_DIR=/tmp/models
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        osm2pgsql osmium-tool postgresql-client libgomp1 \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --uid 10001 --create-home --shell /usr/sbin/nologin chargegrid
+
+WORKDIR /app
+COPY pyproject.toml ./
+COPY app ./app
+COPY alembic ./alembic
+COPY alembic.ini ./
+RUN pip install --no-cache-dir .
+
+USER 10001
+EXPOSE 8000
+CMD ["gunicorn", "app.main:app", "-k", "uvicorn.workers.UvicornWorker", "-w", "1", "-b", "0.0.0.0:8000"]

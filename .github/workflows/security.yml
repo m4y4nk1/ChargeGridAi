@@ -1,0 +1,93 @@
+name: Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 3 * * 1" # weekly, to catch newly published advisories
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]" pip-audit bandit
+      - name: Dependency audit (pip-audit)
+        run: pip-audit --strict --progress-spinner off
+      - name: Static analysis (bandit)
+        run: bandit -r app -ll -q
+
+  node:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm ci
+      - name: Dependency audit (npm)
+        run: npm audit --audit-level=high
+
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build production images
+        run: |
+          docker build -f backend/Dockerfile.prod -t chargegrid-backend:scan backend
+          docker build -f frontend/Dockerfile.prod -t chargegrid-frontend:scan frontend
+      - name: Scan backend image (Trivy)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: chargegrid-backend:scan
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+      - name: Scan frontend image (Trivy)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: chargegrid-frontend:scan
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+  security-tests:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql+asyncpg://chargegrid:chargegrid@localhost:5432/chargegrid
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the database image (PostGIS + h3 + pgvector)
+        run: |
+          docker build -t chargegrid-postgis infra/docker/postgres
+          docker run -d --name db -p 5432:5432 -e POSTGRES_USER=chargegrid \
+            -e POSTGRES_PASSWORD=chargegrid -e POSTGRES_DB=chargegrid chargegrid-postgis
+          for i in $(seq 1 30); do docker exec db pg_isready -U chargegrid && break; sleep 2; done
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - working-directory: backend
+        run: |
+          pip install -e ".[dev]"
+          alembic upgrade head
+          pytest tests/security -q

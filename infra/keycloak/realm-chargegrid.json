@@ -1,0 +1,183 @@
+{
+  "realm": "chargegrid",
+  "enabled": true,
+  "sslRequired": "none",
+  "accessTokenLifespan": 900,
+  "roles": {
+    "realm": [
+      {
+        "name": "viewer",
+        "description": "ChargeGrid viewer"
+      },
+      {
+        "name": "planner",
+        "description": "ChargeGrid planner"
+      },
+      {
+        "name": "admin",
+        "description": "ChargeGrid admin"
+      },
+      {
+        "name": "org_admin",
+        "description": "ChargeGrid org_admin"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "chargegrid-web",
+      "name": "ChargeGrid web app",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": [
+        "http://localhost:5173/*"
+      ],
+      "webOrigins": [
+        "http://localhost:5173"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:5173/*"
+      },
+      "protocolMappers": [
+        {
+          "name": "org",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "org",
+            "claim.name": "org",
+            "jsonType.label": "String",
+            "access.token.claim": "true",
+            "id.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "name": "api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "chargegrid-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "email": "admin@chargegrid.test",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Admin",
+      "lastName": "Test",
+      "attributes": {
+        "org": [
+          "default"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin-dev-only",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "admin",
+        "planner",
+        "viewer"
+      ]
+    },
+    {
+      "username": "planner",
+      "email": "planner@chargegrid.test",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Planner",
+      "lastName": "Test",
+      "attributes": {
+        "org": [
+          "default"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "planner-dev-only",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "planner",
+        "viewer"
+      ]
+    },
+    {
+      "username": "viewer",
+      "email": "viewer@chargegrid.test",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Viewer",
+      "lastName": "Test",
+      "attributes": {
+        "org": [
+          "default"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "viewer-dev-only",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "viewer"
+      ]
+    },
+    {
+      "username": "partner",
+      "email": "partner@chargegrid.test",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Partner",
+      "lastName": "Test",
+      "attributes": {
+        "org": [
+          "partner-cpo"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "partner-dev-only",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "planner",
+        "viewer",
+        "org_admin"
+      ]
+    }
+  ],
+  "components": {
+    "org.keycloak.userprofile.UserProfileProvider": [
+      {
+        "providerId": "declarative-user-profile",
+        "subComponents": {},
+        "config": {
+          "kc.user.profile.config": [
+            "{\"attributes\": [{\"name\": \"username\", \"displayName\": \"${username}\", \"permissions\": {\"view\": [\"admin\", \"user\"], \"edit\": [\"admin\", \"user\"]}}, {\"name\": \"email\", \"displayName\": \"${email}\", \"permissions\": {\"view\": [\"admin\", \"user\"], \"edit\": [\"admin\", \"user\"]}}, {\"name\": \"firstName\", \"displayName\": \"${firstName}\", \"permissions\": {\"view\": [\"admin\", \"user\"], \"edit\": [\"admin\", \"user\"]}}, {\"name\": \"lastName\", \"displayName\": \"${lastName}\", \"permissions\": {\"view\": [\"admin\", \"user\"], \"edit\": [\"admin\", \"user\"]}}, {\"name\": \"org\", \"displayName\": \"Organisation\", \"permissions\": {\"view\": [\"admin\", \"user\"], \"edit\": [\"admin\"]}}]}"
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+# Energy engine: PV + battery sizing and dispatch (Section 9.9). Numeric
+# parameters use the value/illustrative convention and are reported while
+# illustrative. Grid tariffs are in config/tariffs/maharashtra.yaml and
+# PV/battery prices in config/costs/unit_costs.yaml.
+schema_version: 1
+
+pv:
+  # Share of irradiance that reaches the AC side (soiling, wiring, inverter, mismatch).
+  performance_ratio: { value: REPLACE_ME, illustrative: 0.78, source: REPLACE_ME, as_of: REPLACE_ME }
+  temp_coefficient_per_c: { value: REPLACE_ME, illustrative: -0.004, source: REPLACE_ME, as_of: REPLACE_ME }
+  # Cell temperature ~ air temperature + irradiance/800 x this rise (NOCT-style).
+  cell_temp_rise_c: { value: REPLACE_ME, illustrative: 25, source: REPLACE_ME, as_of: REPLACE_ME }
+  inverter_efficiency: { value: REPLACE_ME, illustrative: 0.96, source: REPLACE_ME, as_of: REPLACE_ME }
+  lifetime_years: 25
+  om_pct_capex_per_year: { value: REPLACE_ME, illustrative: 0.01, source: REPLACE_ME, as_of: REPLACE_ME }
+  # Without Google Solar coverage, PV is limited to a canopy over the charging bays.
+  canopy:
+    usable_share_of_bay_area: { value: REPLACE_ME, illustrative: 0.8, source: REPLACE_ME, as_of: REPLACE_ME }
+    kwp_per_m2: { value: REPLACE_ME, illustrative: 0.2, source: REPLACE_ME, as_of: REPLACE_ME }
+
+battery:
+  round_trip_efficiency: { value: REPLACE_ME, illustrative: 0.9, source: REPLACE_ME, as_of: REPLACE_ME }
+  min_soc: 0.1
+  max_soc: 0.95
+  lifetime_years: 10
+  om_pct_capex_per_year: { value: REPLACE_ME, illustrative: 0.02, source: REPLACE_ME, as_of: REPLACE_ME }
+  # How long the sub-hourly charging peak lasts; battery kW covering it must be
+  # backed by this many hours of usable energy.
+  peak_duration_hours: { value: REPLACE_ME, illustrative: 0.5, source: REPLACE_ME, as_of: REPLACE_ME }
+  # Power-conversion cost per kW, on top of unit_costs.yaml bess_inr_per_kwh.
+  inr_per_kw: { value: REPLACE_ME, illustrative: 8000, source: REPLACE_ME, as_of: REPLACE_ME }
+
+grid:
+  # Connections are annualised over this life when comparing LT vs HT.
+  connection_lifetime_years: 20

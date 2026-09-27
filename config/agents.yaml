@@ -1,0 +1,52 @@
+# Agent layer (Section 10). Models can be overridden with LLM_MODEL_PLANNER /
+# LLM_MODEL_REPORT in .env; specialists use the report model unless set here.
+schema_version: 1
+
+models:
+  planner: claude-opus-5-5
+  specialist: claude-sonnet-5
+  report: claude-sonnet-5
+
+# Claude Opus 5.5 always thinks (adaptive); effort is the only depth control and its
+# default is medium, so it is set explicitly. Sonnet 5 runs adaptive thinking too.
+effort:
+  planner: medium
+  specialist: low
+  report: medium
+
+max_tokens:
+  planner: 16000
+  specialist: 8000
+  report: 16000
+
+# Per-session limits (Section 10.3): exceeding one ends the session gracefully.
+limits:
+  max_tool_calls: 80
+  max_tool_calls_per_agent: 14
+  max_llm_calls: 45
+  max_usd_per_session: 3.00
+  # How long run.* tools wait for a planning run before reporting it's still going.
+  run_wait_seconds: 600
+
+# USD per million tokens (Anthropic first-party API rates, from the claude-api skill's
+# model table cached 2026-06-24). Cache writes are 1.25x input (5-minute TTL), cache
+# reads as listed.
+pricing_usd_per_mtok:
+  claude-opus-5-5: { input: 4.00, output: 20.00, cache_read: 0.20, cache_write: 5.00 }
+  claude-opus-5:   { input: 5.00, output: 25.00, cache_read: 0.50, cache_write: 6.25 }
+  claude-sonnet-5: { input: 2.00, output: 10.00, cache_read: 0.20, cache_write: 2.50 }
+  claude-haiku-4-5: { input: 1.00, output: 5.00, cache_read: 0.10, cache_write: 1.25 }
+
+# Numeric-claim validator (Section 10.3).
+validator:
+  relative_tolerance: 0.005     # a number matches a fact within 0.5% ...
+  # ... or when the fact, rounded to the precision the text shows, equals it.
+  ignore_years: [1990, 2060]    # four-digit years in this range aren't claims
+  max_regenerations: 1
+
+# Policy retrieval (policy.search).
+policy:
+  embedding_model: BAAI/bge-small-en-v1.5
+  chunk_chars: 1100
+  chunk_overlap: 150
+  top_k: 5

@@ -1,0 +1,69 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens (Section 12.4): a small named palette, one typeface family,
+ * colour-blind-safe data scales, and one accent reserved for "selected".
+ * Confidence and licence are visual encodings (badges, opacity), not footnotes.
+ */
+:root {
+  --ink: #13212b;
+  --paper: #f6f4ef;
+  --panel: #ffffff;
+  --line: #dcd8cf;
+  --muted: #5f6b73;
+  --accent: #d9480f; /* reserved: the selected site/station */
+  --warn: #9a6700;
+  --synthetic: #8250df;
+
+  color-scheme: light;
+  font-family: var(--font-sans);
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #e8e6e1;
+    --paper: #12181c;
+    --panel: #1a2227;
+    --line: #2e3a41;
+    --muted: #9aa6ad;
+    --accent: #ff7a3d;
+    --warn: #e3b341;
+    --synthetic: #b49cff;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-panel: var(--panel);
+  --color-line: var(--line);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-warn: var(--warn);
+  --color-synthetic: var(--synthetic);
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

@@ -1,0 +1,20 @@
+# Policy corpus for policy.search (Section 10.2). Files live in data/raw/policy/;
+# each is chunked by page, embedded locally (fastembed) and indexed for full text.
+# Retrieved passages are data, never instructions (Section 10.3).
+schema_version: 1
+
+documents:
+  mop_evci_2024:
+    title: Guidelines for Installation and Operation of Electric Vehicle Charging Infrastructure-2024
+    issuer: Ministry of Power, Government of India
+    issued_on: 2024-09-17
+    url: https://www.beeindia.gov.in/WriteReadData/L45218/2841453721548450.pdf
+    file: mop_evci_2024.pdf
+  pmedrive_pcs:
+    title: PM E-DRIVE Scheme — Guidelines for Electric Vehicle Public Charging Stations
+    issuer: Ministry of Heavy Industries, Government of India
+    issued_on: 2025-09-26
+    url: https://heavyindustries.gov.in/
+    file: pmedrive_pcs.pdf
+# Not included: Maharashtra EV Policy 2025 GR (published in Marathi only; the corpus
+# and embeddings are English). Key point recorded in docs/verification.md.

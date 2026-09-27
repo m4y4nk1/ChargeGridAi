@@ -1,0 +1,43 @@
+# Dasymetric allocation of RTO-level EV stock to H3 cells (Section 9.2 step 1).
+# A cell's share of an RTO's stock for a segment is the weighted sum of its
+# share of each feature across the RTO's catchment. Weights per segment sum to 1.
+# Features not yet ingested (built-up share, night lights, income proxy) are
+# absent rather than faked; add them here once their layers exist.
+schema_version: 1
+status: illustrative   # weights are judgement calls, not fitted — confidence MEDIUM at best
+
+h3_res: 8
+
+features:
+  population: { from: worldpop }                                   # h3_cell_feature.population
+  commerce:   { from: osm_poi, categories: [MALL, SUPERMARKET, RESTAURANT, OFFICE_PARK, HOTEL] }
+  transit:    { from: osm_poi, categories: [TRANSIT_HUB] }
+  industrial: { from: osm_poi, categories: [INDUSTRIAL] }
+
+segment_weights:
+  e2w:            { population: 0.8, commerce: 0.2 }
+  e3w_passenger:  { population: 0.5, transit: 0.3, commerce: 0.2 }
+  e3w_goods:      { population: 0.3, commerce: 0.4, industrial: 0.3 }
+  e4w_private:    { population: 0.7, commerce: 0.3 }
+  e4w_fleet_taxi: { population: 0.4, transit: 0.3, commerce: 0.3 }
+  ebus:           { transit: 0.7, population: 0.3 }
+  elcv_etruck:    { industrial: 0.5, commerce: 0.3, population: 0.2 }
+
+# Which admin boundaries each RTO's registrations are spread over.
+# APPROXIMATE: real RTO jurisdictions don't follow OSM taluka lines (Pimpri-
+# Chinchwad sits inside Haveli taluka, for instance), so until jurisdiction
+# boundaries are sourced both PMR RTOs are spread over the whole Pune district
+# (OSM relation 1986140). Per-RTO totals are still preserved exactly.
+rto_catchments:
+  MH12: { boundaries: [1986140], status: approximate }   # Pune
+  MH14: { boundaries: [1986140], status: approximate }   # Pimpri-Chinchwad
+  # Mumbai-Pune corridor (Phase 9), each RTO over its district, equally approximate.
+  MH01: { boundaries: [7964376], status: approximate }   # Mumbai City (Tardeo)
+  MH03: { boundaries: [7964376], status: approximate }   # Mumbai City (Worli)
+  MH02: { boundaries: [7964375], status: approximate }   # Mumbai Suburban (Andheri)
+  MH47: { boundaries: [7964375], status: approximate }   # Mumbai Suburban (Borivali)
+  MH04: { boundaries: [7965684], status: approximate }   # Thane
+  MH05: { boundaries: [7965684], status: approximate }   # Kalyan (Thane district)
+  MH43: { boundaries: [7965684, 7965683], status: approximate }   # Navi Mumbai (Thane + Raigad)
+  MH46: { boundaries: [7965683], status: approximate }   # Panvel (Raigad)
+  MH06: { boundaries: [7965683], status: approximate }   # Pen (Raigad)

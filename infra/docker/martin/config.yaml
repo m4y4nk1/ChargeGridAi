@@ -1,0 +1,53 @@
+# Martin publishes ONLY the layers listed here (auto_publish is off).
+# Auto-discovery would expose every geometry table in the database —
+# including staged source records and fused stations whose licence may
+# forbid open display (ADR 0002) — so each layer is an explicit decision.
+listen_addresses: "0.0.0.0:3000"
+
+postgres:
+  connection_string: ${DATABASE_URL}
+  auto_publish: false
+  tables:
+    road_segment:
+      schema: public
+      table: road_segment
+      srid: 4326
+      geometry_column: geom
+      geometry_type: LINESTRING
+      properties:
+        class: text
+        name: text
+        ref: text
+        maxspeed: text
+        lanes: int4
+    poi:
+      schema: public
+      table: poi
+      srid: 4326
+      geometry_column: geom
+      geometry_type: POINT
+      properties:
+        category: text
+        name: text
+        license_class: text
+    grid_asset:
+      schema: public
+      table: grid_asset
+      srid: 4326
+      geometry_column: geom
+      geometry_type: GEOMETRY
+      properties:
+        type: text
+        voltage_kv: float4
+        confidence: text
+    admin_boundary:
+      schema: public
+      table: admin_boundary
+      srid: 4326
+      geometry_column: geom
+      geometry_type: MULTIPOLYGON
+      properties:
+        osm_id: int8
+        level: text
+        name: text
+        admin_level: int4

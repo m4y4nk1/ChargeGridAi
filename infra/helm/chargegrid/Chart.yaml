@@ -1,0 +1,6 @@
+apiVersion: v2
+name: chargegrid
+description: ChargeGrid AI (API, workers, web app, tiles, routing) for Kubernetes
+type: application
+version: 0.11.0
+appVersion: "0.11.0"

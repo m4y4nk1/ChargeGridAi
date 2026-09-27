@@ -1,0 +1,33 @@
+# Grid module (Section 9.11). Without DISCOM data the grid is a proximity proxy
+# (confidence LOW). With DISCOM asset ratings and loadings (make ingest-discom) each
+# plan site is matched to a distribution transformer or substation and assessed:
+#   headroom_kva = rated_kva x loading_limit - base_peak_kva
+schema_version: 1
+
+matching:
+  # A site draws from the nearest rated distribution transformer within this
+  # distance, else the nearest rated substation within the next one, else the proxy.
+  max_transformer_distance_m: { value: REPLACE_ME, illustrative: 500, source: REPLACE_ME, as_of: REPLACE_ME }
+  max_substation_distance_m: { value: REPLACE_ME, illustrative: 5000, source: REPLACE_ME, as_of: REPLACE_ME }
+
+loading:
+  # Share of nameplate rating an asset may be loaded to (planning margin). Used
+  # when the DISCOM file doesn't give one per asset.
+  default_loading_limit: { value: REPLACE_ME, illustrative: 0.8, source: REPLACE_ME, as_of: REPLACE_ME }
+  # Share of each site's peak hour coinciding with the asset's peak. 1.0 is the
+  # conservative assumption when no hourly base profile is known.
+  coincidence_factor: { value: REPLACE_ME, illustrative: 1.0, source: REPLACE_ME, as_of: REPLACE_ME }
+
+confidence:
+  # DISCOM measurements newer than this are MEDIUM; with an hourly profile no older
+  # than `high_max_age_days` they are HIGH; older ones are LOW.
+  medium_max_age_days: 365
+  high_max_age_days: 90
+
+upgrades:
+  # Standard distribution transformer ratings (kVA), IS 1180 series.
+  transformer_sizes_kva: [100, 160, 200, 250, 315, 400, 500, 630, 1000, 1250, 1600, 2000, 2500]
+  # Replacing a distribution transformer with a larger standard size.
+  transformer_inr_per_kva: { value: REPLACE_ME, illustrative: 2500, source: REPLACE_ME, as_of: REPLACE_ME }
+  transformer_fixed_inr: { value: REPLACE_ME, illustrative: 300000, source: REPLACE_ME, as_of: REPLACE_ME }
+  # Substation augmentation is not costed: it needs a DISCOM system study.

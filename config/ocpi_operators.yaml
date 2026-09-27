@@ -1,0 +1,17 @@
+# Charge point operators that share data over OCPI 2.2.1 (Section 7.1 row 23). Each
+# needs a data agreement. The token goes in .env as OCPI_TOKEN_<ID in upper case>,
+# never here. Records are staged as source "operator:<id>" and fused with the other
+# charger sources; sessions/CDRs feed station utilisation and demand calibration.
+#
+# license_class: what the agreement allows. RESTRICTED_COMMERCIAL (default) keeps the
+# operator's records off the open map and out of exports; OPEN only if the agreement
+# says the data may be republished.
+schema_version: 1
+
+operators: {}
+# Example:
+#   acme:
+#     name: Acme Charging
+#     versions_url: https://ocpi.acme.example/ocpi/versions
+#     license_class: RESTRICTED_COMMERCIAL
+#     modules: [locations, sessions, cdrs]

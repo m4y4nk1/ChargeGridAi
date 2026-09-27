@@ -1,0 +1,14 @@
+# Existing-supply and gap assumptions (Section 9.3). Same value/illustrative
+# convention as segments.yaml.
+schema_version: 1
+
+catchment_minutes: { value: 10, source: "Section 9.1 default urban catchment", as_of: 2026-09-25 }
+availability: { value: REPLACE_ME, illustrative: 0.95, source: REPLACE_ME, as_of: REPLACE_ME }
+# Share of the day a charge point delivers rated power on average.
+target_utilisation: { value: REPLACE_ME, illustrative: 0.25, source: REPLACE_ME, as_of: REPLACE_ME }
+# Most OSM chargers carry no power tag; this stands in for them.
+assumed_kw_when_unknown: { value: REPLACE_ME, illustrative: 15.0, source: REPLACE_ME, as_of: REPLACE_ME }
+# Stations that list no charge points at all are counted as this many.
+assumed_charge_points_when_unknown: { value: 1, source: "conservative floor: a listed station has at least one", as_of: 2026-09-25 }
+# Size of a new charge point when converting the gap into "additional charge points needed".
+new_charge_point_kw: { value: REPLACE_ME, illustrative: 30.0, source: REPLACE_ME, as_of: REPLACE_ME }

@@ -1,0 +1,110 @@
+# Vehicle segments and demand-engine parameters (Section 9.2).
+#
+# Every parameter has:
+#   value:        the sourced number — REPLACE_ME until someone supplies one
+#   illustrative: a clearly labelled stand-in the engine falls back to
+#   source/as_of: where `value` came from
+# While any illustrative fallback is used, outputs list it under
+# `placeholders_in_use` and the UI shows a warning banner (Section 16).
+# The illustrative numbers are order-of-magnitude assumptions for Indian
+# urban fleets, NOT sourced estimates.
+schema_version: 2
+
+segments:
+  e2w:
+    label: "e-2W"
+    scrappage_rate_annual: { value: REPLACE_ME, illustrative: 0.07, source: REPLACE_ME, as_of: REPLACE_ME }
+    annual_km: { value: REPLACE_ME, illustrative: 7000, source: REPLACE_ME, as_of: REPLACE_ME }
+    kwh_per_km: { value: REPLACE_ME, illustrative: 0.03, source: REPLACE_ME, as_of: REPLACE_ME }
+    public_charging_share: { value: REPLACE_ME, illustrative: 0.1, source: REPLACE_ME, as_of: REPLACE_ME }
+    kwh_per_public_session: { value: REPLACE_ME, illustrative: 2.0, source: REPLACE_ME, as_of: REPLACE_ME }
+
+  e3w_passenger:
+    label: "e-3W (passenger)"
+    scrappage_rate_annual: { value: REPLACE_ME, illustrative: 0.1, source: REPLACE_ME, as_of: REPLACE_ME }
+    annual_km: { value: REPLACE_ME, illustrative: 30000, source: REPLACE_ME, as_of: REPLACE_ME }
+    kwh_per_km: { value: REPLACE_ME, illustrative: 0.08, source: REPLACE_ME, as_of: REPLACE_ME }
+    public_charging_share: { value: REPLACE_ME, illustrative: 0.4, source: REPLACE_ME, as_of: REPLACE_ME }
+    kwh_per_public_session: { value: REPLACE_ME, illustrative: 6.0, source: REPLACE_ME, as_of: REPLACE_ME }
+
+  e3w_goods:
+    label: "e-3W (goods)"
+    scrappage_rate_annual: { value: REPLACE_ME, illustrative: 0.1, source: REPLACE_ME, as_of: REPLACE_ME }
+    annual_km: { value: REPLACE_ME, illustrative: 25000, source: REPLACE_ME, as_of: REPLACE_ME }
+    kwh_per_km: { value: REPLACE_ME, illustrative: 0.1, source: REPLACE_ME, as_of: REPLACE_ME }
+    public_charging_share: { value: REPLACE_ME, illustrative: 0.4, source: REPLACE_ME, as_of: REPLACE_ME }
+    kwh_per_public_session: { value: REPLACE_ME, illustrative: 7.0, source: REPLACE_ME, as_of: REPLACE_ME }
+
+  e4w_private:
+    label: "e-4W (private)"
+    scrappage_rate_annual: { value: REPLACE_ME, illustrative: 0.06, source: REPLACE_ME, as_of: REPLACE_ME }
+    annual_km: { value: REPLACE_ME, illustrative: 11000, source: REPLACE_ME, as_of: REPLACE_ME }
+    kwh_per_km: { value: REPLACE_ME, illustrative: 0.14, source: REPLACE_ME, as_of: REPLACE_ME }
+    public_charging_share: { value: REPLACE_ME, illustrative: 0.2, source: REPLACE_ME, as_of: REPLACE_ME }
+    kwh_per_public_session: { value: REPLACE_ME, illustrative: 20.0, source: REPLACE_ME, as_of: REPLACE_ME }
+
+  e4w_fleet_taxi:
+    label: "e-4W (fleet/taxi)"
+    scrappage_rate_annual: { value: REPLACE_ME, illustrative: 0.12, source: REPLACE_ME, as_of: REPLACE_ME }
+    annual_km: { value: REPLACE_ME, illustrative: 50000, source: REPLACE_ME, as_of: REPLACE_ME }
+    kwh_per_km: { value: REPLACE_ME, illustrative: 0.14, source: REPLACE_ME, as_of: REPLACE_ME }
+    public_charging_share: { value: REPLACE_ME, illustrative: 0.6, source: REPLACE_ME, as_of: REPLACE_ME }
+    kwh_per_public_session: { value: REPLACE_ME, illustrative: 25.0, source: REPLACE_ME, as_of: REPLACE_ME }
+
+  ebus:
+    label: "e-bus"
+    scrappage_rate_annual: { value: REPLACE_ME, illustrative: 0.07, source: REPLACE_ME, as_of: REPLACE_ME }
+    annual_km: { value: REPLACE_ME, illustrative: 65000, source: REPLACE_ME, as_of: REPLACE_ME }
+    kwh_per_km: { value: REPLACE_ME, illustrative: 1.2, source: REPLACE_ME, as_of: REPLACE_ME }
+    public_charging_share: { value: REPLACE_ME, illustrative: 0.05, source: REPLACE_ME, as_of: REPLACE_ME }
+    kwh_per_public_session: { value: REPLACE_ME, illustrative: 150.0, source: REPLACE_ME, as_of: REPLACE_ME }
+
+  elcv_etruck:
+    label: "e-LCV / e-truck"
+    scrappage_rate_annual: { value: REPLACE_ME, illustrative: 0.08, source: REPLACE_ME, as_of: REPLACE_ME }
+    annual_km: { value: REPLACE_ME, illustrative: 25000, source: REPLACE_ME, as_of: REPLACE_ME }
+    kwh_per_km: { value: REPLACE_ME, illustrative: 0.25, source: REPLACE_ME, as_of: REPLACE_ME }
+    public_charging_share: { value: REPLACE_ME, illustrative: 0.35, source: REPLACE_ME, as_of: REPLACE_ME }
+    kwh_per_public_session: { value: REPLACE_ME, illustrative: 30.0, source: REPLACE_ME, as_of: REPLACE_ME }
+
+# Multipliers on forecast registrations after the last observed month.
+adoption_cases:
+  slow: { value: REPLACE_ME, illustrative: 0.7, source: REPLACE_ME, as_of: REPLACE_ME }
+  base: { value: 1.0, source: "definition: the fitted forecast itself", as_of: 2026-09-25 }
+  fast: { value: REPLACE_ME, illustrative: 1.4, source: REPLACE_ME, as_of: REPLACE_ME }
+
+
+connector_standards:
+  - CCS2
+  - TYPE2_AC
+  - LECCS
+  - BHARAT_AC001
+  - BHARAT_DC001
+  - CHADEMO
+  - BATTERY_SWAP
+
+
+# VAHAN "Vehicle Class" -> our segment (Section 3 "Indian specifics").
+# Classes not listed here are rejected by the importer rather than guessed.
+vahan_vehicle_class_map:
+  "M-CYCLE/SCOOTER": e2w
+  "MOPED": e2w
+  "MOTORISED CYCLE (CC > 25CC)": e2w
+  "E-RICKSHAW(P)": e3w_passenger
+  "THREE WHEELER (PASSENGER)": e3w_passenger
+  "E-RICKSHAW WITH CART (G)": e3w_goods
+  "THREE WHEELER (GOODS)": e3w_goods
+  "MOTOR CAR": e4w_private
+  "MOTOR CAB": e4w_fleet_taxi
+  "MAXI CAB": e4w_fleet_taxi
+  "BUS": ebus
+  "OMNI BUS": ebus
+  "GOODS CARRIER": elcv_etruck
+
+# VAHAN "Fuel" -> EV powertrain type; fuels not listed are non-EV.
+vahan_ev_fuel_map:
+  "ELECTRIC(BOV)": BEV
+  "PURE EV": BEV
+  "PLUG-IN HYBRID EV": PHEV
+  "STRONG HYBRID EV": HEV
+  "FUEL CELL HYDROGEN": FCEV

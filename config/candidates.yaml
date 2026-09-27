@@ -1,0 +1,32 @@
+# Candidate site generation (Section 9.4). Every candidate records its origin.
+schema_version: 1
+
+# OSM POI categories that can host chargers, and the host type they become.
+host_pois:
+  FUEL:        { host_type: FUEL_STATION }
+  PARKING:     { host_type: PARKING }
+  MALL:        { host_type: MALL }
+  HOTEL:       { host_type: HOTEL }
+  SUPERMARKET: { host_type: SUPERMARKET }
+  OFFICE_PARK: { host_type: OFFICE_PARK }
+  # Railway stations yes; roadside bus stops have no parking to host a charger.
+  TRANSIT_HUB: { host_type: TRANSIT_HUB, exclude_tags: { highway: bus_stop } }
+  # Only highway-side eateries (dhabas), not every restaurant in the city.
+  # Primary is excluded: Pune tags its city arterials primary, which made 577
+  # city restaurants "highway" hosts; motorway/trunk leaves 129.
+  RESTAURANT:  { host_type: HIGHWAY_RESTAURANT, near_road_classes: [motorway, trunk], within_m: 100 }
+
+corridors:
+  road_classes: [motorway, trunk]
+  sample_every_m: 5000          # brief: every 5-10 km
+  min_length_m: 3000            # ignore stubs shorter than this
+  snap_to_host_within_m: 1000   # brief: best host POI within 1 km, else stay on the road
+  host_preference: [FUEL_STATION, HIGHWAY_RESTAURANT, PARKING, HOTEL, MALL]
+
+gap_cells:
+  top_share: 0.10               # brief: top decile of gap cells
+  snap_within_m: 300            # brief: nearest host POI or accessible road within 300 m
+
+dedupe_within_m: 150            # brief: deduplicate within 150 m
+# When candidates merge, the survivor comes from the highest-priority origin.
+origin_priority: [user, poi, gap_cell, corridor]

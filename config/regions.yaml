@@ -1,0 +1,60 @@
+# Modelled regions (Section 1 expansion path: PMR -> Mumbai-Pune corridor ->
+# Maharashtra -> metros). Each region has its own H3 cells, RTO jurisdictions
+# and demand runs; regions may overlap (the corridor contains PMR).
+schema_version: 1
+
+default: pmr
+
+regions:
+  pmr:
+    name: Pune Metropolitan Region
+    bbox: { min_lat: 18.30, min_lng: 73.55, max_lat: 18.80, max_lng: 74.15 }
+    rtos: [MH12, MH14]
+    default_area: 1986140        # Pune district (OSM relation)
+  mumbai_pune:
+    name: Mumbai–Pune corridor
+    bbox: { min_lat: 18.30, min_lng: 72.75, max_lat: 19.35, max_lng: 74.20 }
+    # Mumbai, Thane, Kalyan, Navi Mumbai, Panvel, Raigad (Pen), Pune, Pimpri-Chinchwad.
+    rtos: [MH01, MH02, MH03, MH47, MH04, MH05, MH43, MH46, MH06, MH12, MH14]
+    default_area: 7965683        # Raigad district: the Expressway and NH48 cross it
+
+  # --- planned (Phase 12 expansion path) -----------------------------------------------
+  # Registered so their data readiness can be scored (GET /api/v1/readiness); planning
+  # needs `status: onboarded`, reached by docs/onboarding-regions.md. Bounding boxes are
+  # approximate envelopes; RTO lists are left empty until sourced from the state
+  # transport department (never guessed).
+  maharashtra:
+    name: Maharashtra (state)
+    status: planned
+    bbox: { min_lat: 15.60, min_lng: 72.60, max_lat: 22.10, max_lng: 80.90 }
+    rtos: []
+  delhi_ncr:
+    name: Delhi NCR
+    status: planned
+    bbox: { min_lat: 28.20, min_lng: 76.80, max_lat: 29.00, max_lng: 77.60 }
+    rtos: []
+  bengaluru:
+    name: Bengaluru
+    status: planned
+    bbox: { min_lat: 12.75, min_lng: 77.35, max_lat: 13.25, max_lng: 77.85 }
+    rtos: []
+  chennai:
+    name: Chennai
+    status: planned
+    bbox: { min_lat: 12.75, min_lng: 80.00, max_lat: 13.30, max_lng: 80.35 }
+    rtos: []
+  hyderabad:
+    name: Hyderabad
+    status: planned
+    bbox: { min_lat: 17.20, min_lng: 78.20, max_lat: 17.65, max_lng: 78.70 }
+    rtos: []
+  kolkata:
+    name: Kolkata
+    status: planned
+    bbox: { min_lat: 22.35, min_lng: 88.20, max_lat: 22.80, max_lng: 88.55 }
+    rtos: []
+  ahmedabad:
+    name: Ahmedabad
+    status: planned
+    bbox: { min_lat: 22.90, min_lng: 72.45, max_lat: 23.15, max_lng: 72.70 }
+    rtos: []

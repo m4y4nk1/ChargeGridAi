@@ -1,0 +1,36 @@
+{{- if .Values.networkPolicy.enabled }}
+# Default deny inside the namespace; only the ingress controller reaches the web tier,
+# and only the backend reaches routing. Databases are outside the cluster (RDS,
+# ElastiCache) and reached through security groups.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: chargegrid-default-deny
+spec:
+  podSelector: {}
+  policyTypes: [Ingress]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: chargegrid-from-ingress
+spec:
+  podSelector:
+    matchExpressions:
+      - { key: app.kubernetes.io/component, operator: In, values: [api, frontend, martin] }
+  ingress:
+    - from:
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: ingress-nginx } }
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: chargegrid-valhalla-from-backend
+spec:
+  podSelector: { matchLabels: { app.kubernetes.io/component: valhalla } }
+  ingress:
+    - from:
+        - podSelector:
+            matchExpressions:
+              - { key: app.kubernetes.io/component, operator: In, values: [api, worker, temporal-worker] }
+{{- end }}

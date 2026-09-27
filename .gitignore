@@ -1,0 +1,46 @@
+# Env / secrets
+.env
+*.env.local
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+celerybeat-schedule
+
+# Node / frontend
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Data / build artifacts
+*.pbf
+*.mbtiles
+data/
+minio-data/
+postgres-data/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Golden agent eval outputs
+backend/tests/golden/agent/results/
+
+# Portable bundles (make export-bundle)
+exports/
+
+# Terraform working files (provider binaries, state)
+**/.terraform/
+*.tfstate
+*.tfstate.*
+
+# Valhalla routing graph: generated from the OSM extract on first start
+infra/docker/valhalla/custom_files/*
+!infra/docker/valhalla/custom_files/.gitkeep

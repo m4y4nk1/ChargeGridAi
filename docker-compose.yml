@@ -1,0 +1,168 @@
+x-backend: &backend
+  # One image shared by api/worker/beat — built once (by api), not three times.
+  image: chargegrid-backend:dev
+  env_file: .env
+  environment:
+    DATABASE_URL: postgresql+asyncpg://chargegrid:chargegrid@postgis:5432/chargegrid
+    REDIS_URL: redis://redis:6379/0
+    S3_ENDPOINT: http://minio:9000
+    VALHALLA_URL: http://valhalla:8002
+    MARTIN_URL: http://martin:3000
+    MLFLOW_TRACKING_URI: http://mlflow:5000
+    # Cap glibc heap arenas: solver threads otherwise each keep hundreds of MB.
+    MALLOC_ARENA_MAX: "2"
+  volumes:
+    - ./backend:/app
+    - ./data:/data
+    - ./config:/config:ro
+  depends_on:
+    postgis:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+
+services:
+  postgis:
+    build: ./infra/docker/postgres
+    environment:
+      POSTGRES_USER: chargegrid
+      POSTGRES_PASSWORD: chargegrid
+      POSTGRES_DB: chargegrid
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chargegrid"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    # MinIO no longer publishes community images (Docker Hub and Quay both
+    # gone); Chainguard's build is the same server binary.
+    image: cgr.dev/chainguard/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: chargegrid
+      MINIO_ROOT_PASSWORD: chargegrid123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+
+  valhalla:
+    image: ghcr.io/gis-ops/docker-valhalla/valhalla:latest
+    ports:
+      - "8002:8002"
+    environment:
+      # Builds tiles from custom_files/*.osm.pbf on first start; leave unset
+      # once tiles.tar exists so restarts don't rebuild from scratch.
+      use_tiles_ignore_pbf: "False"
+    volumes:
+      - ./infra/docker/valhalla/custom_files:/custom_files
+
+  martin:
+    image: ghcr.io/maplibre/martin:latest
+    command: ["--config", "/config/martin.yaml"]
+    environment:
+      DATABASE_URL: postgresql://chargegrid:chargegrid@postgis:5432/chargegrid
+    volumes:
+      - ./infra/docker/martin/config.yaml:/config/martin.yaml:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgis:
+        condition: service_healthy
+
+  mlflow:
+    build: ./infra/docker/mlflow
+    ports:
+      - "5050:5000"
+    volumes:
+      - mlflow-data:/mlflow
+
+  api:
+    <<: *backend
+    build: ./backend
+    ports:
+      - "8000:8000"
+
+  worker:
+    <<: *backend
+    # Two processes, recycled after each task: optimisation peaks near 1 GB and Docker
+    # Desktop defaults to ~4 GB for everything.
+    command: ["celery", "-A", "app.workers.celery_app", "worker", "--loglevel=INFO", "--concurrency=2", "--max-tasks-per-child=1"]
+
+  beat:
+    <<: *backend
+    command: ["celery", "-A", "app.workers.celery_app", "beat", "--loglevel=INFO", "--schedule", "/tmp/celerybeat-schedule"]
+
+  frontend:
+    build: ./frontend
+    environment:
+      # Browser-side: must be reachable from the host, not the docker network.
+      VITE_MARTIN_URL: http://localhost:3000
+      VITE_API_URL: http://localhost:8000
+      # Only the browser key (HTTP-referrer restricted in production), never server keys.
+      VITE_GOOGLE_MAPS_BROWSER_KEY: ${VITE_GOOGLE_MAPS_BROWSER_KEY:-}
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+  # --- optional: `docker compose --profile enterprise up -d keycloak` -----------------
+  # Single sign-on for local testing (dev realm with test users; never for production).
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    profiles: ["enterprise"]
+    command: ["start-dev", "--import-realm", "--http-port=8080", "--hostname=http://localhost:8081"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin-dev-only
+      JAVA_OPTS_KC_HEAP: "-XX:MaxRAMPercentage=40 -Xms96m -Xmx384m"
+    volumes:
+      - ./infra/keycloak:/opt/keycloak/data/import:ro
+    ports:
+      - "8081:8080"
+
+  # --- optional: `docker compose --profile temporal up -d` (JOB_RUNNER=temporal) --------
+  temporal:
+    image: temporalio/auto-setup:1.25
+    profiles: ["temporal"]
+    environment:
+      DB: postgres12
+      DB_PORT: "5432"
+      POSTGRES_USER: chargegrid
+      POSTGRES_PWD: chargegrid
+      POSTGRES_SEEDS: postgis
+    ports:
+      - "7233:7233"
+    depends_on:
+      postgis:
+        condition: service_healthy
+
+  temporal-worker:
+    <<: *backend
+    profiles: ["temporal"]
+    command: ["python", "-m", "app.workflows.worker"]
+    restart: unless-stopped  # retries until the Temporal server accepts connections
+    depends_on:
+      - temporal
+
+volumes:
+  postgres-data:
+  minio-data:
+  mlflow-data:

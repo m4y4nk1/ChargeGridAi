@@ -1,0 +1,125 @@
+# Source registry (Section 8.1 `data_source`), upserted by every ingestion
+# run. Licence facts come from docs/verification.md; re-check before release.
+schema_version: 1
+
+sources:
+  osm:
+    name: OpenStreetMap
+    license_class: OPEN
+    license_text: Open Database License (ODbL) 1.0
+    attribution: © OpenStreetMap contributors
+    terms_url: https://www.openstreetmap.org/copyright
+    refresh_cadence: daily
+    stale_after_days: 7
+
+  ocm:
+    name: Open Charge Map
+    license_class: OPEN
+    license_text: CC BY 4.0 for OCM-contributed records; non-open DataProvider records are dropped at ingestion
+    attribution: Open Charge Map (openchargemap.org)
+    terms_url: https://openchargemap.org/site/about/terms
+    refresh_cadence: daily
+    stale_after_days: 7
+
+  bee_evyatra:
+    name: BEE EV Yatra public charging stations
+    license_class: GOVERNMENT
+    license_text: Government of India data; cite source
+    attribution: Bureau of Energy Efficiency, EV Yatra
+    terms_url: https://evyatra.beeindia.gov.in/
+    refresh_cadence: monthly (manual export)
+    stale_after_days: 45
+
+  vahan:
+    name: VAHAN vehicle registrations
+    license_class: GOVERNMENT
+    license_text: Government of India data; cite source
+    attribution: MoRTH / Parivahan VAHAN dashboard
+    terms_url: https://analytics.parivahan.gov.in/analytics/publicdashboard/vahan
+    refresh_cadence: monthly (manual export)
+    stale_after_days: 45
+
+  synthetic_vahan:
+    name: Synthetic registrations (VAHAN schema) — NOT REAL DATA
+    license_class: SYNTHETIC
+    license_text: Generated fixture (backend/app/ingestion/synthetic.py); stands in until real VAHAN exports are imported
+    attribution: Synthetic data — not for operational use
+    terms_url: null
+    refresh_cadence: on demand
+    stale_after_days: null
+
+  worldpop:
+    name: WorldPop Global2 R2025A population (100 m, constrained)
+    license_class: OPEN
+    license_text: CC BY 4.0
+    attribution: WorldPop (www.worldpop.org)
+    terms_url: https://hub.worldpop.org/data/licence.txt
+    refresh_cadence: annual
+    stale_after_days: 730
+
+  google_solar:
+    name: Google Solar API (Building Insights)
+    license_class: RESTRICTED_GOOGLE
+    license_text: Google Maps Platform Terms; Solar API content cached at most 30 days, never warehoused, not shown beside non-Google maps
+    attribution: © Google
+    terms_url: https://cloud.google.com/maps-platform/terms/maps-service-terms
+    access: live           # fetched on use, never ingested (licence)
+    refresh_cadence: on demand
+    stale_after_days: 30
+
+  nasa_power:
+    name: NASA POWER hourly solar irradiance (Pune)
+    license_class: OPEN
+    license_text: NASA POWER data are free to use without restriction; cite the POWER Project
+    attribution: "Data obtained from the NASA Langley Research Center (LaRC) POWER Project, funded through the NASA Earth Science/Applied Science Program"
+    terms_url: https://power.larc.nasa.gov/docs/referencing/
+    refresh_cadence: annual
+    stale_after_days: 730
+
+  google_maps:
+    name: Google Maps (basemap, Maps JavaScript API)
+    license_class: RESTRICTED_GOOGLE
+    license_text: Google Maps Platform Terms; tiles display in the Google map only, never stored
+    attribution: © Google
+    terms_url: https://cloud.google.com/maps-platform/terms/maps-service-terms
+    access: live           # rendered in the browser, never ingested
+    refresh_cadence: live
+    stale_after_days: null
+
+  google_places:
+    name: Google Places API (New)
+    license_class: RESTRICTED_GOOGLE
+    license_text: Google Maps Platform Terms; place_id storable, other fields live-display only
+    attribution: © Google
+    terms_url: https://cloud.google.com/maps-platform/terms/maps-service-terms
+    access: live           # fetched on use, never ingested (licence)
+    refresh_cadence: on demand
+    stale_after_days: null
+
+  mappls:
+    name: Mappls (MapmyIndia)
+    license_class: RESTRICTED_COMMERCIAL
+    license_text: Commercial terms; no display on or beside non-Mappls maps
+    attribution: Powered by Mappls
+    terms_url: https://about.mappls.com/api/terms-&-conditions
+    access: live           # fetched on use, never ingested (licence)
+    refresh_cadence: on demand
+    stale_after_days: null
+
+  policy_corpus:
+    name: EV charging policy documents (MoP guidelines, PM E-DRIVE)
+    license_class: GOVERNMENT
+    license_text: Government of India publications; cite document and page
+    attribution: Ministry of Power / Bureau of Energy Efficiency; Ministry of Heavy Industries
+    terms_url: https://www.beeindia.gov.in/
+    refresh_cadence: on publication (manual)
+    stale_after_days: 365
+
+  discom:
+    name: DISCOM grid asset ratings and loadings (transformers, substations)
+    license_class: RESTRICTED_COMMERCIAL
+    license_text: Contractual (data agreement with the DISCOM); internal analysis only, never on the open map or in exports; raw files are not kept
+    attribution: Distribution licensee (per agreement)
+    terms_url: null
+    refresh_cadence: per agreement
+    stale_after_days: 365

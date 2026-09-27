@@ -1,0 +1,42 @@
+# EV-specific electricity tariffs for Maharashtra (Section 7.1 row 19, Section 9.10).
+# To be populated from the current MERC tariff order — see docs/verification.md
+# item 9 for the order status found during Phase 0 research. The `illustrative`
+# numbers are stand-ins so finance can run; they are NOT the tariff order.
+# Since Phase 9 they follow the regime that secondary sources report for MERC Case
+# No. 217 of 2024 (MSEDCL EV category, FY2025-26 to FY2029-30): a concessional energy
+# charge around ₹5-5.5/kWh and demand charges waived in the initial years. Earlier
+# stand-ins (₹8/₹7.5 per kWh, ₹75/₹350 per kVA-month) overstated grid costs and pushed
+# the energy engine towards batteries to avoid demand charges. The post-waiver demand
+# charge schedule is not captured. Time-of-day slabs remain an illustrative shape.
+schema_version: 2
+discom: REPLACE_ME              # e.g. MSEDCL — confirm which DISCOM per PMR area
+tariff_order_number: REPLACE_ME
+tariff_order_effective_date: REPLACE_ME
+source: REPLACE_ME
+
+lt_ev_tariff:
+  connection_type: LT
+  energy_charge_inr_per_kwh: { value: REPLACE_ME, illustrative: 5.5, source: REPLACE_ME, as_of: REPLACE_ME }
+  demand_charge_inr_per_kva_month: { value: REPLACE_ME, illustrative: 0, source: REPLACE_ME, as_of: REPLACE_ME }
+  # Time-of-day adjustments in INR/kWh added to the energy charge, by hour range
+  # [start, end). Illustrative shape: night rebate, morning and evening peaks.
+  # Replace with the MERC order's ToD table.
+  tod_slabs:
+    - { start: 0,  end: 6,  adder_inr_per_kwh: { value: REPLACE_ME, illustrative: -1.5, source: REPLACE_ME, as_of: REPLACE_ME } }
+    - { start: 9,  end: 12, adder_inr_per_kwh: { value: REPLACE_ME, illustrative: 0.8,  source: REPLACE_ME, as_of: REPLACE_ME } }
+    - { start: 18, end: 22, adder_inr_per_kwh: { value: REPLACE_ME, illustrative: 1.1,  source: REPLACE_ME, as_of: REPLACE_ME } }
+    - { start: 22, end: 24, adder_inr_per_kwh: { value: REPLACE_ME, illustrative: -1.5, source: REPLACE_ME, as_of: REPLACE_ME } }
+
+ht_ev_tariff:
+  connection_type: HT
+  voltage_kv: 11
+  energy_charge_inr_per_kwh: { value: REPLACE_ME, illustrative: 5.0, source: REPLACE_ME, as_of: REPLACE_ME }
+  demand_charge_inr_per_kva_month: { value: REPLACE_ME, illustrative: 0, source: REPLACE_ME, as_of: REPLACE_ME }
+  # Time-of-day adjustments in INR/kWh added to the energy charge, by hour range
+  # [start, end). Illustrative shape: night rebate, morning and evening peaks.
+  # Replace with the MERC order's ToD table.
+  tod_slabs:
+    - { start: 0,  end: 6,  adder_inr_per_kwh: { value: REPLACE_ME, illustrative: -1.5, source: REPLACE_ME, as_of: REPLACE_ME } }
+    - { start: 9,  end: 12, adder_inr_per_kwh: { value: REPLACE_ME, illustrative: 0.8,  source: REPLACE_ME, as_of: REPLACE_ME } }
+    - { start: 18, end: 22, adder_inr_per_kwh: { value: REPLACE_ME, illustrative: 1.1,  source: REPLACE_ME, as_of: REPLACE_ME } }
+    - { start: 22, end: 24, adder_inr_per_kwh: { value: REPLACE_ME, illustrative: -1.5, source: REPLACE_ME, as_of: REPLACE_ME } }

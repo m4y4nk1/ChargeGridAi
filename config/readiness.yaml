@@ -1,0 +1,27 @@
+# Per-region data readiness (Phase 12): which inputs a region has, weighted by how much
+# the planning results depend on them. Each dimension scores 0-1 from checks against
+# the database and the routing engine; the region score is the weighted mean x 100.
+schema_version: 1
+
+weights:
+  roads_pois: 0.14         # OSM roads and host POIs (candidates, accessibility)
+  boundaries: 0.04         # districts/talukas (area KPIs)
+  routing: 0.12            # Valhalla graph covers the region (catchments)
+  population: 0.10         # WorldPop on H3
+  registrations: 0.16      # vehicle registrations (real VAHAN vs synthetic)
+  demand: 0.10             # forecast + gap runs exist
+  chargers: 0.10           # existing supply, number of fused sources
+  grid: 0.10               # DISCOM assets vs OSM substations only
+  solar: 0.04              # irradiance for the energy engine
+  tariffs_costs: 0.06      # sourced (not placeholder) tariffs and unit costs
+  operator_feeds: 0.04     # observed utilisation for calibration
+
+grades:                    # minimum score for each grade
+  A: 80
+  B: 60
+  C: 40
+  D: 0
+
+thresholds:
+  min_road_segments: 1000
+  min_pois: 100

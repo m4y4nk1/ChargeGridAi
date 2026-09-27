@@ -1,0 +1,92 @@
+# Defaults are for staging; values-prod.yaml overrides for production (ADR 0012).
+image:
+  registry: ""            # e.g. <account>.dkr.ecr.ap-south-1.amazonaws.com
+  backend: chargegrid-backend
+  frontend: chargegrid-frontend
+  tag: ""                 # set by the pipeline to the git SHA
+  pullPolicy: IfNotPresent
+
+env: staging
+host: staging.chargegrid.example
+tlsSecret: chargegrid-tls
+ingressClass: nginx
+
+# Non-secret settings (Settings in backend/app/core/settings.py).
+config:
+  APP_ENV: staging
+  AUTH_REQUIRED: "true"
+  JOB_RUNNER: temporal
+  TEMPORAL_ADDRESS: temporal-frontend.temporal:7233
+  VALHALLA_URL: http://chargegrid-valhalla:8002
+  MARTIN_URL: http://chargegrid-martin:3000
+  MLFLOW_TRACKING_URI: http://mlflow.mlops:5000
+  OIDC_AUDIENCE: chargegrid-api
+  OIDC_CLIENT_ID: chargegrid-web
+  CORS_ORIGINS: '["https://staging.chargegrid.example"]'
+  MALLOC_ARENA_MAX: "2"
+
+# Secrets come from AWS Secrets Manager through the External Secrets Operator; the
+# chart only references the synced Kubernetes secret. Keys expected in it:
+# DATABASE_URL, REDIS_URL, JWT_SECRET, OIDC_ISSUER, ANTHROPIC_API_KEY, OCM_API_KEY,
+# GOOGLE_MAPS_SERVER_KEY, S3_BUCKET (+ OCPI_TOKEN_<ID> per operator).
+externalSecret:
+  enabled: true
+  store: aws-secrets-manager
+  remoteKey: chargegrid/staging
+secretName: chargegrid-secrets
+
+# Mounted at /config: the versioned config/ directory, built into a ConfigMap by the
+# pipeline (kubectl create configmap --from-file). Admin edits live in the database.
+configMapName: chargegrid-config
+
+api:
+  replicas: 2
+  resources:
+    requests: { cpu: 250m, memory: 768Mi }
+    limits: { memory: 2Gi }
+  hpa: { enabled: true, min: 2, max: 6, cpu: 70 }
+
+worker:
+  replicas: 1
+  concurrency: 2
+  resources:
+    requests: { cpu: 500m, memory: 1Gi }
+    limits: { memory: 3Gi }
+
+temporalWorker:
+  enabled: true
+  replicas: 1
+  resources:
+    requests: { cpu: 500m, memory: 1Gi }
+    limits: { memory: 3Gi }
+
+beat:
+  enabled: true
+
+frontend:
+  replicas: 2
+  resources:
+    requests: { cpu: 50m, memory: 64Mi }
+    limits: { memory: 256Mi }
+
+martin:
+  image: ghcr.io/maplibre/martin:v0.14.2
+  replicas: 1
+  resources:
+    requests: { cpu: 100m, memory: 128Mi }
+    limits: { memory: 512Mi }
+
+valhalla:
+  image: ghcr.io/gis-ops/docker-valhalla/valhalla:latest
+  replicas: 1
+  tilesPvc: chargegrid-valhalla-tiles   # pre-built tiles (see infra/terraform README)
+  resources:
+    requests: { cpu: 500m, memory: 1Gi }
+    limits: { memory: 3Gi }
+
+serviceAccount:
+  # IRSA role (Terraform output backend_role_arn): S3 raw lake, Secrets Manager.
+  roleArn: ""
+
+networkPolicy:
+  enabled: true

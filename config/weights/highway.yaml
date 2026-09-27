@@ -1,0 +1,13 @@
+# Weight profile: Highway operator (Section 9.6 of the project brief)
+name: highway
+label: "Highway operator"
+version: 1
+weights:
+  demand: 0.20
+  accessibility: 0.10
+  traffic: 0.30
+  grid: 0.20
+  land: 0.10
+  future_growth: 0.05
+  competition_gap: 0.05
+  equity: 0.00

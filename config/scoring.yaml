@@ -1,0 +1,56 @@
+# Scoring (Section 9.6). Sub-scores are percentile ranks within the run's
+# feasible candidates; what each one measures is documented in
+# docs/methodology/scoring.md. Numeric assumptions use the value/illustrative
+# convention (config/demand/segments.yaml) and are reported when illustrative.
+schema_version: 1
+
+default_profile: cpo_commercial   # config/weights/<name>.yaml
+top_n: 20                         # "top N" for rank robustness and the headline list
+shortlist_multiple: 3             # shortlist = top 3 x N (the why-not pool in Section 9.7)
+
+robustness:
+  draws: 1000
+  # Dirichlet concentration: CV of a 0.2 weight is about 20% at 100 (brief: +/-20%).
+  concentration: 100
+  seed: 20260925
+
+catchment:
+  # Same drive-time catchment as the Phase 3 supply model (config/demand/supply.yaml).
+  isochrone_concurrency: 8
+
+accessibility:
+  # Functional road hierarchy, best first. A ranking, not a measurement.
+  road_class_order: [motorway, trunk, primary, secondary, tertiary, unclassified, residential, living_street, service]
+
+traffic:
+  # No traffic counts or speed data are ingested. Proxy: length of major road
+  # within this radius. Replace with TomTom/HERE/AADT data when available.
+  major_road_classes: [motorway, trunk, primary, motorway_link, trunk_link, primary_link]
+  radius_m: 1000
+
+land:
+  # How suitable each host type is for a public charger (0-1): parking,
+  # dwell time, visibility and landlord willingness. No survey exists yet.
+  host_suitability:
+    FUEL_STATION:        { value: REPLACE_ME, illustrative: 1.0, source: REPLACE_ME, as_of: REPLACE_ME }
+    PARKING:             { value: REPLACE_ME, illustrative: 0.9, source: REPLACE_ME, as_of: REPLACE_ME }
+    MALL:                { value: REPLACE_ME, illustrative: 0.9, source: REPLACE_ME, as_of: REPLACE_ME }
+    TRANSIT_HUB:         { value: REPLACE_ME, illustrative: 0.8, source: REPLACE_ME, as_of: REPLACE_ME }
+    HIGHWAY_RESTAURANT:  { value: REPLACE_ME, illustrative: 0.8, source: REPLACE_ME, as_of: REPLACE_ME }
+    USER_SITE:           { value: REPLACE_ME, illustrative: 0.8, source: REPLACE_ME, as_of: REPLACE_ME }
+    HOTEL:               { value: REPLACE_ME, illustrative: 0.7, source: REPLACE_ME, as_of: REPLACE_ME }
+    SUPERMARKET:         { value: REPLACE_ME, illustrative: 0.7, source: REPLACE_ME, as_of: REPLACE_ME }
+    OFFICE_PARK:         { value: REPLACE_ME, illustrative: 0.7, source: REPLACE_ME, as_of: REPLACE_ME }
+    ROADSIDE:            { value: REPLACE_ME, illustrative: 0.3, source: REPLACE_ME, as_of: REPLACE_ME }
+  parking_within_m: 100
+  # Added when an OSM parking facility is within parking_within_m of a non-parking host.
+  parking_bonus: { value: REPLACE_ME, illustrative: 0.1, source: REPLACE_ME, as_of: REPLACE_ME }
+
+future_growth:
+  horizon_years: 4                # brief: demand CAGR to target + 4 years
+
+equity:
+  # A cell is underserved when existing supply covers less than this share of
+  # its demand (Phase 3 access ratio). No income data is ingested, so the
+  # equity score covers access only.
+  underserved_access_ratio: { value: REPLACE_ME, illustrative: 0.5, source: REPLACE_ME, as_of: REPLACE_ME }

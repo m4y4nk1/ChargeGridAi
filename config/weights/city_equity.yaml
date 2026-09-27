@@ -1,0 +1,13 @@
+# Weight profile: City government / equity (Section 9.6 of the project brief)
+name: city_equity
+label: "City government / equity"
+version: 1
+weights:
+  demand: 0.20
+  accessibility: 0.20
+  traffic: 0.05
+  grid: 0.10
+  land: 0.10
+  future_growth: 0.10
+  competition_gap: 0.05
+  equity: 0.20
